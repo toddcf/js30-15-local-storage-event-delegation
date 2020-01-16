@@ -28,7 +28,49 @@
 <script>
   const addItems = document.querySelector('.add-items');
   const itemsList = document.querySelector('.plates');
-  const items = [];
+  // Try and get items from localStorage. If they don't exist, create an empty array:
+  const items = JSON.parse(localStorage.getItem('items')) || [];
+
+  const addItem = (e) => {
+    // Stop the page from reloading on form submit:
+    e.preventDefault();
+    // e.currentTarget is the whole form. Look inside the form for a name attribute of "item" and get its value:
+    const text = (e.currentTarget.querySelector('[name=item]')).value;
+    // Put the text of the input onto the page:
+    const item = {
+      text,
+      // By default is NOT in "done" state:
+      done: false
+    };
+    // Add the user input to the "items" array:
+    items.push(item);
+    console.table(items);
+    // Add item to the HTML list:
+    populateList(items, itemsList);
+    // Save in localStorage, which only accepts strings:
+    localStorage.setItem('items', JSON.stringify(items));
+    // Clear the form element:
+    e.currentTarget.reset();
+  }
+
+  // Create the HTML for the list:
+    // Set plates to an empty array by default to prevent breakage:
+  const populateList = (plates = [], platesList) => {
+    platesList.innerHTML = plates.map((plate, i) => {
+      return `
+        <li>
+          <input type="checkbox" data-index="${i}" id="item${i}" ${plate.done ? 'checked' : ''}/>
+          <label for="item${i}">${plate.text}</label>
+        </li>
+      `;
+    }).join(''); // Convert from array to string.
+  }
+
+  // Listen for 'submit' rather than 'click':
+  addItems.addEventListener('submit', addItem);
+
+  // Pull list from localStorage so that it's persistent:
+  populateList(items, itemsList);
 
 </script>
 
