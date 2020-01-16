@@ -1,1 +1,1 @@
-# js30-15-local-storage-event-delegation
+# JavaScript 30 #15: Local Storage and Event Delegation
