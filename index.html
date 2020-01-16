@@ -66,8 +66,26 @@
     }).join(''); // Convert from array to string.
   }
 
+  // Toggle "done" state using event delegation, since event listeners won't get attached to elements that don't exist yet:
+  const toggleState = (e) => {
+    const el = e.target;
+    // Only accept clicks on inputs:
+    if (el.matches('input')) {
+      const index = el.dataset.index;
+      console.log(index);
+      // Set it to the opposie of itself:
+      items[index].done = !items[index].done;
+      // Store in localStorage:
+      localStorage.setItem('items', JSON.stringify(items));
+      // Update the UI:
+      populateList(items, itemsList);
+    }
+  }
+
   // Listen for 'submit' rather than 'click':
   addItems.addEventListener('submit', addItem);
+  // Listen for clicks on the unordered list:
+  itemsList.addEventListener('click', toggleState);
 
   // Pull list from localStorage so that it's persistent:
   populateList(items, itemsList);
