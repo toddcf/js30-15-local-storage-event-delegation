@@ -1,0 +1,1 @@
+# js30-15-local-storage-event-delegation
