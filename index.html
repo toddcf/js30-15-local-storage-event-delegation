@@ -28,120 +28,110 @@
     </form>
   </div>
 
-<script>
-  const addItems = document.querySelector('.add-items');
-  const itemsList = document.querySelector('.plates');
-  // Try and get items from localStorage. If they don't exist, create an empty array:
-  let items = JSON.parse(localStorage.getItem('items')) || [];
+  <script>
 
-  const addItem = (e) => {
-    // Stop the page from reloading on form submit:
-    e.preventDefault();
-    // e.currentTarget is the whole form. Look inside the form for a name attribute of "item" and get its value:
-    const text = (e.currentTarget.querySelector('[name=item]')).value;
-    // Put the text of the input onto the page:
-    const item = {
-      text,
-      // By default is NOT in "done" state:
-      done: false
-    };
-    // Add the user input to the "items" array:
-    items.push(item);
-    console.table(items);
-    // Add item to the HTML list:
-    populateList(items, itemsList);
-    // Save in localStorage, which only accepts strings:
-    localStorage.setItem('items', JSON.stringify(items));
-    // Clear the form element:
-    e.currentTarget.reset();
-  }
-
-  // Create the HTML for the list:
-    // Set plates to an empty array by default to prevent breakage:
-  const populateList = (plates = [], platesList) => {
-    platesList.innerHTML = plates.map((plate, i) => {
-      return `
-        <li>
-          <input type="checkbox" data-index="${i}" id="item${i}" ${plate.done ? 'checked' : ''}/>
-          <label for="item${i}">${plate.text}</label>
-        </li>
-      `;
-    }).join(''); // Convert from array to string.
-  }
-
-  // Toggle "done" state using event delegation, since event listeners won't get attached to elements that don't exist yet:
-  const toggleState = (e) => {
-    const el = e.target;
-    // Only accept clicks on inputs:
-    if (el.matches('input')) {
-      const index = el.dataset.index;
-      console.log(index);
-      // Set it to the opposite of itself:
-      items[index].done = !items[index].done;
-      // Store in localStorage:
-      localStorage.setItem('items', JSON.stringify(items));
-      // Update the UI:
-      populateList(items, itemsList);
+    const tapas = {
+      addItems: document.querySelector('.add-items'),
+      itemsList: document.querySelector('.plates'),
+      // Try and get items from localStorage. If they don't exist, create an empty array:
+      items: JSON.parse(localStorage.getItem('items')) || [],
+      addItem: (e) => {
+        // Stop the page from reloading on form submit:
+        e.preventDefault();
+        // e.currentTarget is the whole form. Look inside the form for a name attribute of "item" and get its value:
+        const text = (e.currentTarget.querySelector('[name=item]')).value;
+        // Put the text of the input onto the page:
+        const item = {
+          text,
+          // By default is NOT in "done" state:
+          done: false
+        };
+        // Add the user input to the "items" array:
+        tapas.items.push(item);
+        // Add item to the HTML list:
+        tapas.populateList(tapas.items, tapas.itemsList);
+        // Save in localStorage, which only accepts strings:
+        localStorage.setItem('items', JSON.stringify(tapas.items));
+        // Clear the form element:
+        e.currentTarget.reset();
+      },
+      // Create the HTML for the list:
+        // Set plates to an empty array by default to prevent breakage:
+      populateList: (plates = [], platesList) => {
+        platesList.innerHTML = plates.map((plate, i) => {
+          return `
+            <li>
+              <input type="checkbox" data-index="${i}" id="item${i}" ${plate.done ? 'checked' : ''}/>
+              <label for="item${i}">${plate.text}</label>
+            </li>
+          `;
+        }).join(''); // Convert from array to string.
+      },
+      // Toggle "done" state using event delegation, since event listeners won't get attached to elements that don't exist yet:
+      toggleState: (e) => {
+        const el = e.target;
+        // Only accept clicks on inputs:
+        if (el.matches('input')) {
+          const index = el.dataset.index;
+          // Set it to the opposite of itself:
+          tapas.items[index].done = !tapas.items[index].done;
+          // Store in localStorage:
+          localStorage.setItem('items', JSON.stringify(tapas.items));
+          // Update the UI:
+          tapas.populateList(tapas.items, tapas.itemsList);
+        }
+      },
+      selectAllItems: (e) => {
+        // Stop the page from reloading on form submit:
+        e.preventDefault();
+        tapas.items.forEach(function(item) {
+          item.done = true;
+        });
+        // Store in localStorage:
+        localStorage.setItem('items', JSON.stringify(tapas.items));
+        // Update the UI:
+        tapas.populateList(tapas.items, tapas.itemsList);
+      },
+      deselectAllItems: (e) => {
+        // Stop the page from reloading on form submit:
+        e.preventDefault();
+        tapas.items.forEach(function(item) {
+          item.done = false;
+        });
+        // Store in localStorage:
+        localStorage.setItem('items', JSON.stringify(tapas.items));
+        // Update the UI:
+        tapas.populateList(tapas.items, tapas.itemsList);
+      },
+      resetList: (e) => {
+        // Stop the page from reloading on form submit:
+        e.preventDefault();
+        // Clear localStorage:
+        localStorage.clear();
+        // Clear the items array:
+        tapas.items = [];
+        // Update the UI:
+        tapas.populateList(tapas.items, tapas.itemsList);
+      },
+      init: () => {
+        // Listen for 'submit' rather than 'click':
+        tapas.addItems.addEventListener('submit', tapas.addItem);
+        // Listen for clicks on the unordered list:
+        tapas.itemsList.addEventListener('click', tapas.toggleState);
+        // Select All:
+        document.getElementById('selectAll').addEventListener('click', tapas.selectAllItems);
+        // Deselect All:
+        document.getElementById('deselectAll').addEventListener('click', tapas.deselectAllItems);
+        // Listen for "Clear List":
+        document.getElementById('clearList').addEventListener('click', tapas.resetList);
+        // Pull list from localStorage so that it's persistent:
+        tapas.populateList(tapas.items, tapas.itemsList);
+      }
     }
-  }
 
-  const selectAllItems = (e) => {
-    // Stop the page from reloading on form submit:
-    e.preventDefault();
-    console.log('selectAllItems was invoked.');
-    items.forEach(function(item) {
-      item.done = true;
-    });
-    // Store in localStorage:
-    localStorage.setItem('items', JSON.stringify(items));
-    // Update the UI:
-    populateList(items, itemsList);
-  }
+    tapas.init();
 
-  const deselectAllItems = (e) => {
-    // Stop the page from reloading on form submit:
-    e.preventDefault();
-    console.log('deselectAllItems was invoked.');
-    items.forEach(function(item) {
-      item.done = false;
-    });
-    // Store in localStorage:
-    localStorage.setItem('items', JSON.stringify(items));
-    // Update the UI:
-    populateList(items, itemsList);
-  }
-
-  const resetList = (e) => {
-    // Stop the page from reloading on form submit:
-    e.preventDefault();
-    console.table(items);
-    // Clear localStorage:
-    localStorage.clear();
-    console.table(items);
-    // Clear the items array:
-    items = [];
-    console.table(items);
-    // Update the UI:
-    populateList(items, itemsList);
-    console.table(items);
-  }
-
-  // Listen for 'submit' rather than 'click':
-  addItems.addEventListener('submit', addItem);
-  // Listen for clicks on the unordered list:
-  itemsList.addEventListener('click', toggleState);
-  // Select All:
-  document.getElementById('selectAll').addEventListener('click', selectAllItems);
-  // Deselect All:
-  document.getElementById('deselectAll').addEventListener('click', deselectAllItems);
-  // Listen for "Clear List":
-  document.getElementById('clearList').addEventListener('click', resetList);
-
-  // Pull list from localStorage so that it's persistent:
-  populateList(items, itemsList);
-
-</script>
-
+  </script>
 
 </body>
 </html>
