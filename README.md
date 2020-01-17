@@ -3,6 +3,3 @@
 To Do:
 
 - Convert to object literal.
-- Add "Check All" button.
-- Add "Uncheck All" button.
-- Add "Clear List" button.
